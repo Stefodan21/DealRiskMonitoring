@@ -170,25 +170,20 @@ class DealRiskMonitoringAgent:
                 continue
             if quarter and account.quarter.lower() != quarter.lower():
                 continue
-            if not self._is_at_risk(account, risk_level):
+            if risk_level:
+                if self._derive_risk_level(account) != risk_level:
+                    continue
+                if risk_level in {"high", "medium"} and not self._is_at_risk(account):
+                    continue
+            elif not self._is_at_risk(account):
                 continue
             filtered.append(account)
 
         return filtered
 
-    def _is_at_risk(self, account: Account, risk_level: Optional[str]) -> bool:
+    def _is_at_risk(self, account: Account) -> bool:
         at_risk = account.engagement_score < 30 or account.days_since_activity >= 60
-        if not at_risk:
-            return False
-
-        if risk_level == "high":
-            return account.engagement_score < 20 or account.days_since_activity >= 70
-        if risk_level == "medium":
-            return 20 <= account.engagement_score < 30 or 60 <= account.days_since_activity < 70
-        if risk_level == "low":
-            return account.engagement_score >= 25 and account.days_since_activity < 60
-
-        return True
+        return at_risk
 
     def _fetch_competitor_intel(self, accounts: List[Account]) -> Dict[str, str]:
         intel: Dict[str, str] = {}
@@ -211,7 +206,7 @@ class DealRiskMonitoringAgent:
     def _derive_risk_level(self, account: Account) -> str:
         if account.engagement_score < 20 or account.days_since_activity >= 70:
             return "high"
-        if account.engagement_score < 30 or account.days_since_activity >= 60:
+        if self._is_at_risk(account):
             return "medium"
         return "low"
 

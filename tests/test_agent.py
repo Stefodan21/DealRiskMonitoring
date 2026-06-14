@@ -34,6 +34,14 @@ class DealRiskMonitoringAgentTests(unittest.TestCase):
         self.assertIn("Playbook Recommendations:", summary)
         self.assertIn("Actionable Next Steps:", summary)
 
+    def test_medium_risk_filter_includes_medium_account(self) -> None:
+        response = self.agent.handle_prompt(
+            "Show me medium risk manufacturing accounts in Q2 with playbook"
+        )
+
+        companies = [account.company for account in response.accounts_at_risk]
+        self.assertIn("Adventure Works", companies)
+
 
 if __name__ == "__main__":
     unittest.main()
