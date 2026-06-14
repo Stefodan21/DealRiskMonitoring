@@ -1,0 +1,12 @@
+{
+  "name": "deal-risk-monitoring",
+  "version": "0.1.0",
+  "description": "Custom engine agent core that helps account managers monitor deal risk and churn potential.",
+  "type": "module",
+  "main": "src/agent.js",
+  "scripts": {
+    "demo": "node src/cli.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
